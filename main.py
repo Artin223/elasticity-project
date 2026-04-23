@@ -6,5 +6,11 @@ load_dotenv("APIFredKey.env")
 FredAPIKey= os.getenv("APIFredKey")
 FredReady = Fred(api_key=FredAPIKey)
 
-IDChoice = input("Enter your object of interest: ")
+objectID = {
+    "gas": {"price": "GASREGW", "demand": "DNRGRA3M086SBEA"},
+    "food": {"price": "CPIUFDNS", "demand": "DFXARA3M086SBEA"},
+    "electricity": {"price": "APU000072610", "demand": "DNRERA3M086SBEA"}
+}
 
+IDChoice = input("Enter your object of interest: ") 
+IDChoice = IDChoice.strip().lower()
