@@ -13,11 +13,18 @@ objectID = {
 }
  
 IDChoice = input("Enter your object of interest: ").strip().lower() 
- 
+StartTimeChoice = input('Enter desired start time as YYYY-MM or enter "latest" for latest avaible date: ').strip().lower()
+if StartTimeChoice != "latest":
+    EndTimeChoice = input("Enter desired end time as YYYY-MM: ")
 
+#also do supply elasticity of workers
 PriceID = objectID[IDChoice]["price"]
 DemandID = objectID[IDChoice]["demand"]
 
 PriceSeries = FredActivate.get_series(PriceID)
 DemandSeries = FredActivate.get_series(DemandID)
 
+MonthlyPriceSeries = PriceSeries.resample('MS').mean()
+MonthlyDemandSeries = DemandSeries.resample('MS').mean()
+
+print(MonthlyPriceSeries, MonthlyDemandSeries)
