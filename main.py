@@ -56,7 +56,12 @@ while True:
             print("Invalid date format or date not available. Please enter dates in YYYY-MM format and ensure they are within the available range.")
             
 #end of while loop
-PriceElasticity = ((Demand2 - Demand1) / Demand1) / ((Price2 - Price1) / Price1)
+PriceElasticity = ((Demand2-Demand1)/(Demand2+Demand1))/((Price2+Price1)/(Price2-Price1))
 PriceElasticity = abs(PriceElasticity)
 PriceElasticity = round(PriceElasticity, 2)
 print(f"The price elasticity of {IDChoice} is: {PriceElasticity}")
+
+if PriceElasticity > 1:
+    print(f"{IDChoice} is elastic, meaning that a change in price changes demand greatly.")
+else:
+    print(f"{IDChoice} is not elastic, meaning that a change in price does not change demand significantly.")
