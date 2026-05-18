@@ -45,6 +45,7 @@ while True:
                 Price2 = MonthlyPriceSeries.loc[EndTimeChoice].iloc[0]
                 Demand1 = MonthlyDemandSeries.loc[StartTimeChoice].iloc[0]
                 Demand2 = MonthlyDemandSeries.loc[EndTimeChoice].iloc[0]
+                print(f"Price1: {Price1}, Price2: {Price2}, Demand1: {Demand1}, Demand2: {Demand2}")
                 
         else:
                 Price1 = MonthlyPriceSeries.iloc[-2]
@@ -56,7 +57,7 @@ while True:
             print("Invalid date format or date not available. Please enter dates in YYYY-MM format and ensure they are within the available range.")
             
 #end of while loop
-PriceElasticity = ((Demand2-Demand1)/(Demand2+Demand1))/((Price2+Price1)/(Price2-Price1))
+PriceElasticity = ((Demand2-Demand1)/Demand1) / ((Price2-Price1)/Price1)
 PriceElasticity = abs(PriceElasticity)
 PriceElasticity = round(PriceElasticity, 2)
 print(f"The price elasticity of {IDChoice} is: {PriceElasticity}")
