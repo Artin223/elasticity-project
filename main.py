@@ -8,17 +8,21 @@ FredAPIKey= os.getenv("APIFredKey")
 FredActivate = Fred(api_key=FredAPIKey)
 
 objectID = {
-    "gas": {"price": "GASREGW", "demand": "DNRGRA3M086SBEA"}, 
+    "gas": {"price": "GASREGCOVM", "demand": "DNRGRA3M086SBEA"}, 
     "food": {"price": "CPIUFDNS", "demand": "DFXARA3M086SBEA"},
-    "electricity": {"price": "APU000072610", "demand": "DNRERA3M086SBEA"},
+    "electricity": {"price": "APU000072610", "demand": "IPN22112RS"},
     "durables": {"price": "CUSR0000SAD","demand": "PCEDGC96"},
-    "nondurables": {"price": "CUSR0000SAC","demand": "PCNDC96"},
+    "nondurables": {"price": "CUSR0000SAC","demand": "PCEND"},
     "services": {"price": "CUSR0000SAS","demand": "PCESC96"},
     "dining": {"price": "CUSR0000SEFV", "demand": "RSFSDP"},
-    "apparel": {"price": "CUSR0000SAA", "demand": "RSAPPFS"},
-    "vehicles": {"price": "CUUR0000SETA01", "demand": "RSMVDFED"},
-    "furniture": {"price": "CUSR0000SEHG", "demand": "RSFHFS"},
-    "alcohol": {"price": "CUSR0000SAF116", "demand": "RSBDFS"}
+    "apparel": {"price": "SUUR0000SAA", "demand": "RSCCASN"},
+    "vehicles": {"price": "CUUR0000SETA01", "demand": "RSMVPD"},
+    "furniture": {"price": "CUSR0000SAH3", "demand": "RSFHFS"},
+    "alcohol": {"price": "CUSR0000SAF116", "demand": "MRTSSM4453USN"},
+    "shelter": {"price": "CUSR0000SAH1", "demand": "HSN1F"},
+    "health and personal care": {"price": "CUSR0000SAM1", "demand": "RSHPCS"},
+    "retail trade": {"price": "CPIAUCSL", "demand": "RSXFS"},
+    "medical goods": {"price": "CUSR0000SAM1", "demand": "RSHPCS"},
 }
 while True:
     try:
@@ -44,8 +48,7 @@ while True:
                 Price1 = MonthlyPriceSeries.loc[StartTimeChoice].iloc[0]
                 Price2 = MonthlyPriceSeries.loc[EndTimeChoice].iloc[0]
                 Demand1 = MonthlyDemandSeries.loc[StartTimeChoice].iloc[0]
-                Demand2 = MonthlyDemandSeries.loc[EndTimeChoice].iloc[0]
-                print(f"Price1: {Price1}, Price2: {Price2}, Demand1: {Demand1}, Demand2: {Demand2}")
+                Demand2 = MonthlyDemandSeries.loc[EndTimeChoice].iloc[0]         
                 
         else:
                 Price1 = MonthlyPriceSeries.iloc[-2]
