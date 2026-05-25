@@ -47,17 +47,19 @@ objectID = {
     "education services": {"price": "CUSR0000SAE1","demand": "USEDCATNQGSP"}
 }
 
-st.title("Elasticity Calculator")
+st.title("Real-Time Price Elasticity Index")
 
 
 IDChoice = st.selectbox("Select your object of interest:", list(objectID.keys()))
+UseLatest = st.checkbox("Use latest available Year-over-Year data")
 
 
-StartTimeChoice = st.text_input('Enter start time (YYYY-MM) or type "latest":', "latest").strip().lower()
-
-
-if StartTimeChoice != "latest":
-    EndTimeChoice = st.text_input("Enter end time (YYYY-MM):").strip()
+if UseLatest:
+    StartTimeChoice = "latest"
+    EndTimeChoice = "latest" 
+else:
+    StartTimeChoice = st.text_input("Enter Start Date (YYYY-MM):")
+    EndTimeChoice = st.text_input("Enter End Date (YYYY-MM):")
 
 
 if st.button("Calculate"):
@@ -67,11 +69,15 @@ if st.button("Calculate"):
 
     PriceSeries = FredActivate.get_series(PriceID)
     DemandSeries = FredActivate.get_series(DemandID)
-
-    MonthlyPriceSeries = to_monthly(PriceSeries)
-    MonthlyDemandSeries = to_monthly(DemandSeries)
-
     
+    AlignedSeries = pd.DataFrame({"price": PriceSeries, "demand": DemandSeries}).dropna()
+    CleanPriceSeries = AlignedSeries["price"]
+    CleanDemandSeries = AlignedSeries["demand"]
+
+    MonthlyPriceSeries = to_monthly(CleanPriceSeries)
+    MonthlyDemandSeries = to_monthly(CleanDemandSeries)
+
+
     try:
         if StartTimeChoice != "latest":
             Price1 = MonthlyPriceSeries.loc[StartTimeChoice]
@@ -83,9 +89,9 @@ if st.button("Calculate"):
             Demand1 = GetSingleValue(Demand1)
             Demand2 = GetSingleValue(Demand2)        
         else:
-            Price1 = MonthlyPriceSeries.iloc[-2]
+            Price1 = MonthlyPriceSeries.iloc[-13]
             Price2 = MonthlyPriceSeries.iloc[-1]
-            Demand1 = MonthlyDemandSeries.iloc[-2]
+            Demand1 = MonthlyDemandSeries.iloc[-13]
             Demand2 = MonthlyDemandSeries.iloc[-1]
 
         
@@ -106,3 +112,6 @@ if st.button("Calculate"):
 
     except KeyError:
         st.write("Error: Invalid date format or date not available. Please check your dates and try again.")
+
+st.markdown("---")
+st.caption("*Data is dynamically sourced from the Federal Reserve Economic Data (FRED) API.*")
