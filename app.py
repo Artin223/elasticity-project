@@ -21,6 +21,11 @@ def to_monthly(series):
     else:
         return series.resample("MS").ffill()
 
+def GetSingleValue(RawData):
+    if isinstance(RawData, pd.Series):
+        return RawData.iloc[0]   
+    else:
+        return RawData
 
 objectID = {
     "gas": {"price": "GASREGCOVM", "demand": "DNRGRA3M086SBEA"}, 
@@ -35,7 +40,7 @@ objectID = {
     "furniture": {"price": "CUSR0000SAH3", "demand": "RSFHFS"},
     "alcohol": {"price": "CUSR0000SAF116", "demand": "MRTSSM4453USN"},
     "shelter": {"price": "CUSR0000SAH1", "demand": "HSN1F"},
-    "health services": {"price": "CUSR0000SAM2", "demand": "USPCEHLTHCARE"},
+    "health services": {"price": "CPIMEDSL", "demand": "DHLCRX1Q020SBEA"},
     "retail trade": {"price": "CPIAUCSL", "demand": "RSXFS"},
     "medical goods": {"price": "CUSR0000SAM1", "demand": "RSHPCS"},
     "recreational goods": {"price": "CPIRECSL","demand": "MRTSSM451USN"},
@@ -72,7 +77,11 @@ if st.button("Calculate"):
             Price1 = MonthlyPriceSeries.loc[StartTimeChoice]
             Price2 = MonthlyPriceSeries.loc[EndTimeChoice]
             Demand1 = MonthlyDemandSeries.loc[StartTimeChoice]
-            Demand2 = MonthlyDemandSeries.loc[EndTimeChoice]         
+            Demand2 = MonthlyDemandSeries.loc[EndTimeChoice] 
+            Price1 = GetSingleValue(Price1)
+            Price2 = GetSingleValue(Price2)
+            Demand1 = GetSingleValue(Demand1)
+            Demand2 = GetSingleValue(Demand2)        
         else:
             Price1 = MonthlyPriceSeries.iloc[-2]
             Price2 = MonthlyPriceSeries.iloc[-1]
@@ -84,6 +93,9 @@ if st.button("Calculate"):
         PriceElasticity = abs(PriceElasticity)
         PriceElasticity = round(PriceElasticity, 2)
         
+        if pd.isna(PriceElasticity):
+            st.error(f"Could not calculate elasticity. Data for **{IDChoice}** might not be available for both selected months.")
+            st.stop() 
         
         st.write(f"The price elasticity of {IDChoice} is: **{PriceElasticity}**")
 
