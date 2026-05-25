@@ -7,6 +7,13 @@ load_dotenv("APIFredKey.env")
 FredAPIKey= os.getenv("APIFredKey")
 FredActivate = Fred(api_key=FredAPIKey)
 
+def to_monthly(series):
+    FrequancyIndex = pd.infer_freq(series.index)
+    if FrequancyIndex == "M" or FrequancyIndex == "MS":
+        return series.resample("MS").mean()
+    else:
+        return series.resample("MS").ffill()
+
 objectID = {
     "gas": {"price": "GASREGCOVM", "demand": "DNRGRA3M086SBEA"}, 
     "food": {"price": "CPIUFDNS", "demand": "DFXARA3M086SBEA"},
@@ -20,9 +27,11 @@ objectID = {
     "furniture": {"price": "CUSR0000SAH3", "demand": "RSFHFS"},
     "alcohol": {"price": "CUSR0000SAF116", "demand": "MRTSSM4453USN"},
     "shelter": {"price": "CUSR0000SAH1", "demand": "HSN1F"},
-    "health and personal care": {"price": "CUSR0000SAM1", "demand": "RSHPCS"},
+    "health services": {"price": "CUSR0000SAM2", "demand": "USPCEHLTHCARE"},
     "retail trade": {"price": "CPIAUCSL", "demand": "RSXFS"},
     "medical goods": {"price": "CUSR0000SAM1", "demand": "RSHPCS"},
+    "recreational goods": {"price": "CPIRECSL","demand": "MRTSSM451USN"},
+    "education services": {"price": "CUSR0000SAE1","demand": "USEDCATNQGSP"}
 }
 while True:
     try:
@@ -32,23 +41,23 @@ while True:
         DemandID = objectID[IDChoice]["demand"]
         break
     except KeyError:        
-        print("Invalid input. Please enter a valid object of interest from the list: gas, food, electricity, durables, nondurables, services, dining, apparel, vehicles, furniture, alcohol.")
+        print("Invalid input. Please enter a valid object of interest")
 #end of while loop
 PriceSeries = FredActivate.get_series(PriceID)
 DemandSeries = FredActivate.get_series(DemandID)
 
-MonthlyPriceSeries = PriceSeries.resample('MS').mean()
-MonthlyDemandSeries = DemandSeries.resample('MS').mean()
+MonthlyPriceSeries = to_monthly(PriceSeries)
+MonthlyDemandSeries = to_monthly(DemandSeries)
 while True:
     try:
         StartTimeChoice = input('Enter desired start time as YYYY-MM or enter "latest" for latest avaible date: ').strip().lower()
         if StartTimeChoice != "latest":
             EndTimeChoice = input("Enter desired end time as YYYY-MM: ")
         if StartTimeChoice != "latest":
-                Price1 = MonthlyPriceSeries.loc[StartTimeChoice].iloc[0]
-                Price2 = MonthlyPriceSeries.loc[EndTimeChoice].iloc[0]
-                Demand1 = MonthlyDemandSeries.loc[StartTimeChoice].iloc[0]
-                Demand2 = MonthlyDemandSeries.loc[EndTimeChoice].iloc[0]         
+                Price1 = MonthlyPriceSeries.loc[StartTimeChoice]
+                Price2 = MonthlyPriceSeries.loc[EndTimeChoice]
+                Demand1 = MonthlyDemandSeries.loc[StartTimeChoice]
+                Demand2 = MonthlyDemandSeries.loc[EndTimeChoice]         
                 
         else:
                 Price1 = MonthlyPriceSeries.iloc[-2]
