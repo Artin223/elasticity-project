@@ -14,10 +14,13 @@ except:
 FredActivate = Fred(api_key=FredAPIKey)
 
 
-def to_monthly(series):
+def ToMonthly(series):
     FrequancyIndex = pd.infer_freq(series.index)
-    if FrequancyIndex == "M" or FrequancyIndex == "MS":
-        return series.resample("MS").mean()
+    if FrequancyIndex is not None:
+        if FrequancyIndex == "M" or FrequancyIndex == "MS":
+            return series.resample("MS").mean()
+        else:
+            return series.resample("MS").ffill()
     else:
         return series.resample("MS").ffill()
 
@@ -32,7 +35,7 @@ objectID = {
     "food": {"price": "CPIUFDNS", "demand": "DFXARA3M086SBEA"},
     "electricity": {"price": "APU000072610", "demand": "IPN22112RS"},
     "durables": {"price": "CUSR0000SAD","demand": "PCEDGC96"},
-    "nondurables": {"price": "CUSR0000SAC","demand": "PCEND"},
+    "nondurables": {"price": "CUSR0000SAC","demand": "PCENDC96"},
     "services": {"price": "CUSR0000SAS","demand": "PCESC96"},
     "dining": {"price": "CUSR0000SEFV", "demand": "RSFSDP"},
     "apparel": {"price": "SUUR0000SAA", "demand": "RSCCASN"},
@@ -74,8 +77,8 @@ if st.button("Calculate"):
     CleanPriceSeries = AlignedSeries["price"]
     CleanDemandSeries = AlignedSeries["demand"]
 
-    MonthlyPriceSeries = to_monthly(CleanPriceSeries)
-    MonthlyDemandSeries = to_monthly(CleanDemandSeries)
+    MonthlyPriceSeries = ToMonthly(CleanPriceSeries)
+    MonthlyDemandSeries = ToMonthly(CleanDemandSeries)
 
 
     try:
@@ -95,7 +98,7 @@ if st.button("Calculate"):
             Demand2 = MonthlyDemandSeries.iloc[-1]
 
         
-        PriceElasticity = ((Demand2-Demand1)/Demand1) / ((Price2-Price1)/Price1)
+        PriceElasticity = ((Demand2 - Demand1) / (Demand2 + Demand1)) * ((Price2 + Price1) / (Price2 - Price1))
         PriceElasticity = abs(PriceElasticity)
         PriceElasticity = round(PriceElasticity, 2)
         
