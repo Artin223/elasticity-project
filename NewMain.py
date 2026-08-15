@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from fredapi import Fred
 import numpy 
 import scipy.stats
+import scipy.optimize
 load_dotenv("APIFredKey.env")
 FredAPIKey= os.getenv("APIFredKey")
 FredActivate = Fred(api_key=FredAPIKey)
@@ -18,6 +19,12 @@ def ToMonthly(series):
     else:
         return series.resample("MS").ffill()
 
+def calcRevenue(price, demandLine):
+    revenue = price * (demandLine.intercept + (demandLine.slope * price))
+    return revenue
+
+def revenueForOptimizer(price, demandLine):
+    return -(calcRevenue(price, demandLine))
 
 objectID = {
     "gas": {"price": "GASREGCOVM", "demand": "DNRGRA3M086SBEA"}, 
@@ -58,8 +65,24 @@ MonthlyDemandSeries = ToMonthly(DemandSeries)
 AlignedSeries = pd.DataFrame({"price": MonthlyPriceSeries, "demand": MonthlyDemandSeries}).dropna()
 CleanPriceSeries = AlignedSeries["price"]
 CleanDemandSeries = AlignedSeries["demand"]
+sampleSize = len(CleanPriceSeries)
 
 loggedPriceSeries = numpy.log(CleanPriceSeries)
 loggedDemandSeries = numpy.log(CleanDemandSeries)
-print(loggedPriceSeries)
-ElasticityLine = scipy.stats.linregress(loggedPriceSeries, loggedDemandSeries)
+
+elasticityLine = scipy.stats.linregress(loggedPriceSeries, loggedDemandSeries)
+demandLine = scipy.stats.linregress(CleanPriceSeries, CleanDemandSeries)
+
+elasticity = elasticityLine.slope
+standardOfError = elasticityLine.stderr
+criticalValues = scipy.stats.t.ppf(0.975, (sampleSize - 2))
+
+marginOfError = standardOfError * criticalValues
+# upperBound = elasticity + marginOfError
+# lowerBound = elasticity - marginOfError
+
+print(f"{IDChoice}'s elasticity is {round(elasticity, 2)} with a +- {round(marginOfError, 2)} margin of error")
+print(demandLine.slope, demandLine.intercept)
+optimizedResult = scipy.optimize.minimize_scalar(revenueForOptimizer, args = (demandLine, ), bounds = (0, (-demandLine.intercept)/(demandLine.slope)))
+optimizedPrice = optimizedResult.x
+print(optimizedPrice)
