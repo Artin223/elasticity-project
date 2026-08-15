@@ -19,12 +19,12 @@ def ToMonthly(series):
     else:
         return series.resample("MS").ffill()
 
-def calcRevenue(price, demandLine):
-    revenue = price * (demandLine.intercept + (demandLine.slope * price))
+def calcRevenue(price, demandSlope, demandIntercept):
+    revenue = price * (demandIntercept + (demandSlope * price))
     return revenue
 
-def revenueForOptimizer(price, demandLine):
-    return -(calcRevenue(price, demandLine))
+def revenueForOptimizer(price,  demandSlope, demandIntercept):
+    return -(calcRevenue(price,  demandSlope, demandIntercept))
 
 objectID = {
     "gas": {"price": "GASREGCOVM", "demand": "DNRGRA3M086SBEA"}, 
@@ -70,8 +70,15 @@ sampleSize = len(CleanPriceSeries)
 loggedPriceSeries = numpy.log(CleanPriceSeries)
 loggedDemandSeries = numpy.log(CleanDemandSeries)
 
-elasticityLine = scipy.stats.linregress(loggedPriceSeries, loggedDemandSeries)
-demandLine = scipy.stats.linregress(CleanPriceSeries, CleanDemandSeries)
+differencedPriceSeries = CleanPriceSeries.diff().dropna()
+differencedDemandSeries = CleanDemandSeries.diff().dropna()
+differencedLoggedDemandSeries = differencedDemandSeries.diff().dropna()
+differencedLoggedPriceSeries = differencedPriceSeries.diff().dropna()
+
+elasticityLine = scipy.stats.linregress(differencedLoggedPriceSeries, differencedLoggedDemandSeries)
+demandLine = scipy.stats.linregress(differencedPriceSeries, differencedDemandSeries)
+demandSlope = demandLine.slope
+demandIntercept = CleanDemandSeries.mean() - (demandSlope * CleanPriceSeries.mean())
 
 elasticity = elasticityLine.slope
 standardOfError = elasticityLine.stderr
@@ -82,7 +89,8 @@ marginOfError = standardOfError * criticalValues
 # lowerBound = elasticity - marginOfError
 
 print(f"{IDChoice}'s elasticity is {round(elasticity, 2)} with a +- {round(marginOfError, 2)} margin of error")
-print(demandLine.slope, demandLine.intercept)
-optimizedResult = scipy.optimize.minimize_scalar(revenueForOptimizer, args = (demandLine, ), bounds = (0, (-demandLine.intercept)/(demandLine.slope)))
+# print(demandLine.slope, demandLine.intercept)
+optimizedResult = scipy.optimize.minimize_scalar(revenueForOptimizer, args = (demandSlope, demandIntercept, ), bounds = (0, (-demandIntercept)/(demandSlope)))
 optimizedPrice = optimizedResult.x
 print(optimizedPrice)
+print((-demandIntercept)/(demandSlope))
