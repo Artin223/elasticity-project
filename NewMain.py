@@ -72,8 +72,8 @@ loggedDemandSeries = numpy.log(CleanDemandSeries)
 
 differencedPriceSeries = CleanPriceSeries.diff().dropna()
 differencedDemandSeries = CleanDemandSeries.diff().dropna()
-differencedLoggedDemandSeries = differencedDemandSeries.diff().dropna()
-differencedLoggedPriceSeries = differencedPriceSeries.diff().dropna()
+differencedLoggedDemandSeries = loggedPriceSeries.diff().dropna()
+differencedLoggedPriceSeries = loggedPriceSeries.diff().dropna()
 
 elasticityLine = scipy.stats.linregress(differencedLoggedPriceSeries, differencedLoggedDemandSeries)
 demandLine = scipy.stats.linregress(differencedPriceSeries, differencedDemandSeries)

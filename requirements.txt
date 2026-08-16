@@ -2,3 +2,5 @@ streamlit
 pandas
 fredapi
 python-dotenv
+numpy
+scipy
