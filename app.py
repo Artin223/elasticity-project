@@ -177,9 +177,8 @@ with RegressionTab:
             st.caption("Fit on month-to-month percent changes. Removes shared-trend bias, at the cost of a wider, noisier interval.")
  
         st.info(
-            "These two numbers can disagree because of a real statistical tradeoff: the raw regression is "
-            "biased but precise, and the differenced version is unbiased but noisier. Reporting both, "
-            "honestly, is more defensible than picking one."
+            "These two numbers can disagree because of a statistical tradeoff. the raw regression is "
+            "biased but precise, and the differenced version is unbiased but with a higher margin of error."
         )
  
         # Revenue-maximizing price, built on a differenced (trend-corrected) demand curve
