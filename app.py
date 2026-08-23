@@ -213,9 +213,11 @@ with RegressionTab:
 
             Col3, Col4 = st.columns(2)
             with Col3:
-                st.metric("Optimal price", f"{OptimizedPrice:.2f} {PriceUnits}")
+                st.metric("Optimal price", f"{OptimizedPrice:.2f}")
+                st.caption(PriceUnits)
             with Col4:
-                st.metric("Choke price (demand hits 0)", f"{ChokePrice:.2f} {PriceUnits}")
+                st.metric("Choke price (demand hits 0)", f"{ChokePrice:.2f}")
+                st.caption(PriceUnits)
             st.caption(
                 f"Estimated revenue at this price: {MaxRevenue:.2f} ({PriceUnits} × {DemandUnits}). "
                 "treat it as a relative comparison across candidate prices, not a literal "
